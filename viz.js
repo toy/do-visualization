@@ -64,26 +64,12 @@ function handleDragEnd(e) {
     });
 }
 
-
-function getFiles(e) {
-    var files = e.dataTransfer.files;
-    if(files.length <= 0){
-        reportError("please drop a file(s)")
-        return [];
-    }
-    if(files.length > 2){
-        reportError("please drop at most two files")
-        return [];
-    }
-    return files
-}
-
 function readFilesAndLoad(files, loader) {
     if (!window.FileReader) {
         reportError('your browser does not have the necessary file reader API.');
         return;
     }
-    
+
     var left = files.length
     var texts = []
 
@@ -105,7 +91,7 @@ function readFilesAndLoad(files, loader) {
     }
 }
 
-function loadFiles(texts){
+function loadTexts(texts){
     for (var i = 0; i < texts.length; i++) {
         if (isBenchmark(texts[i])) loadBenchmark(texts[i])
     }
@@ -123,15 +109,18 @@ function handleDrop(e) {
     [].forEach.call(cols, function (col) {
         col.classList.remove('over');
     });
-    
-    // See the section on the DataTransfer object.
-    files = getFiles(e)
-    if(!files){
-        return false;
+
+    if (e.dataTransfer.files.length) {
+        readFilesAndLoad(e.dataTransfer.files, loadTexts)
+    } else {
+        var text = e.dataTransfer.getData('Text')
+        if (text) {
+            loadTexts([text])
+        } else {
+            reportError("please drop a file(s) or text")
+        }
     }
 
-    //document.getElementById('debug').innerHTML = file; 
-    readFilesAndLoad(files, loadFiles);
     return false;
 }
 
@@ -140,23 +129,20 @@ function handleDrop(e) {
  ***/
 function setup() {
 
-	var cols = document.querySelectorAll('.drop_zone');
-	[].forEach.call(cols, function(col) {
-		col.addEventListener('dragstart', handleDragStart, false);
-		col.addEventListener('dragenter', handleDragEnter, false);
-		col.addEventListener('dragleave', handleDragLeave, false);
-		col.addEventListener('dragover',  handleDragOver, false);
-		col.addEventListener('dragend',   handleDragEnd, false);
-	});
+    var cols = document.querySelectorAll('.drop_zone');
+    [].forEach.call(cols, function(col) {
+        col.addEventListener('dragstart', handleDragStart, false);
+        col.addEventListener('dragenter', handleDragEnter, false);
+        col.addEventListener('dragleave', handleDragLeave, false);
+        col.addEventListener('dragover',  handleDragOver, false);
+        col.addEventListener('dragend',   handleDragEnd, false);
+    });
 
-	var cols = document.querySelectorAll('#drop_zone');
-	[].forEach.call(cols, function(col) {
-		col.addEventListener('drop', handleDrop, false);
-	});
+    var cols = document.querySelectorAll('#drop_zone');
+    [].forEach.call(cols, function(col) {
+        col.addEventListener('drop', handleDrop, false);
+    });
 
 }
 
 setup();
-
-
-
