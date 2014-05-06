@@ -366,6 +366,8 @@ function checkValidity(solution, obj) {
         } else if (visited[i] > 1) {
             revisited.push(i);
             benchmark[i].error = true;
+        } else {
+            benchmark[i].error = false;
         }
     }
     
